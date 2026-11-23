@@ -1,0 +1,7 @@
+[web]
+%{ for nombre, n in nodos ~}
+${nombre} ansible_host=${n.contenedor} puerto=${n.puerto}
+%{ endfor ~}
+
+[web:vars]
+ansible_connection=community.docker.docker
