@@ -4,5 +4,6 @@ variable "nodos" {
   default = {
     web1 = 8081
     web2 = 8082
+    web3 = 8083
   }
 }
