@@ -1,0 +1,13 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: tienda
+servers: 1            # plano de control
+agents: 2             # nodos de trabajo
+ports:
+  - port: 8080:80     # localhost:8080 (Windows) → puerto 80 del clúster (Traefik)
+    nodeFilters:
+      - loadbalancer
+  - port: 8443:443    # lo mismo para HTTPS (lo usaremos con cert-manager)
+    nodeFilters:
+      - loadbalancer

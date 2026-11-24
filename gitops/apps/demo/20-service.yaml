@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+  namespace: demo
+spec:
+  type: ClusterIP
+  selector:
+    app: whoami            # manda el tráfico a los pods con esta etiqueta
+  ports:
+    - port: 80
+      targetPort: 80
