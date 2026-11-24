@@ -4,7 +4,7 @@ metadata:
   name: whoami
   namespace: demo
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
       app: whoami          # el Deployment gestiona los pods con esta etiqueta
