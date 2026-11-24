@@ -1,0 +1,14 @@
+global:
+  domain: argocd.localhost        # el nombre por el que entraremos
+
+configs:
+  params:
+    server.insecure: true         # Traefik recibe HTTP; sin esto, Argo fuerza HTTPS y entra en bucle
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+
+dex:
+  enabled: false                  # sin login externo: ahorra memoria

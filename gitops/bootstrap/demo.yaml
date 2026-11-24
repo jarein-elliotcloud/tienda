@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo
+  namespace: argocd                  # las Applications viven en el namespace de Argo
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jarein-elliotcloud/tienda.git
+    targetRevision: main             # rama (o tag, o commit) a seguir
+    path: gitops/apps/demo           # carpeta con los manifiestos
+  destination:
+    server: https://kubernetes.default.svc   # "este mismo clúster"
+    namespace: demo
+  # Sin syncPolicy: de momento, sincronización MANUAL
