@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: prueba-prune
-  namespace: demo
-data:
-  mensaje: "si me borras de Git, desaparezco del clúster"
