@@ -13,3 +13,7 @@ spec:
     server: https://kubernetes.default.svc   # "este mismo clúster"
     namespace: demo
   # Sin syncPolicy: de momento, sincronización MANUAL
+  syncPolicy:
+    automated:
+      selfHeal: true    # deshace los cambios hechos a mano en el clúster
+      prune: true       # borra lo que desaparezca de Git
