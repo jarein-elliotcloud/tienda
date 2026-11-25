@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+data:
+  01-esquema.sql: |
+    CREATE TABLE clientes (
+      id     SERIAL PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      email  TEXT UNIQUE NOT NULL,
+      creado TIMESTAMPTZ DEFAULT now()
+    );
+    CREATE TABLE productos (
+      id     SERIAL PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      precio NUMERIC(8,2) NOT NULL CHECK (precio >= 0)
+    );
+    CREATE TABLE pedidos (
+      id         SERIAL PRIMARY KEY,
+      cliente_id INT NOT NULL REFERENCES clientes(id),
+      fecha      TIMESTAMPTZ DEFAULT now(),
+      estado     TEXT NOT NULL DEFAULT 'nuevo'
+    );
+    CREATE TABLE lineas_pedido (
+      pedido_id   INT REFERENCES pedidos(id) ON DELETE CASCADE,
+      producto_id INT REFERENCES productos(id),
+      cantidad    INT NOT NULL CHECK (cantidad > 0),
+      PRIMARY KEY (pedido_id, producto_id)
+    );

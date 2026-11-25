@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres          # el Service headless que da nombre DNS a cada pod
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: tienda
+            - name: POSTGRES_USER
+              value: tienda_admin
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:            # la contraseña NO está en Git: viene de un Secret
+                  name: postgres-admin
+                  key: password
+            - name: PGDATA                # subcarpeta: Postgres exige un directorio vacío propio
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d   # scripts que se ejecutan al crear la BBDD
+          readinessProbe:                 # "no me mandes tráfico hasta que acepte conexiones"
+            exec:
+              command: ["pg_isready", "-U", "tienda_admin", "-d", "tienda"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 1Gi }
+      volumes:
+        - name: init
+          configMap:
+            name: postgres-init
+  volumeClaimTemplates:           # un PVC por pod, creado automáticamente: data-postgres-0
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]   # lo monta un solo nodo a la vez
+        storageClassName: local-path-retain
+        resources:
+          requests:
+            storage: 2Gi
