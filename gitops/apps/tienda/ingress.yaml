@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tienda
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: tienda.localhost      # a diferencia de whoami, con host: solo responde a este nombre
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: back
+                port:
+                  name: http
