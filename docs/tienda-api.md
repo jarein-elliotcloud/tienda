@@ -21,3 +21,22 @@ Navegador/curl ─(Host: tienda.localhost)─> localhost:8080 ─> Traefik
 
 ## Cómo probar
 Ver pruebas de aceptación del ticket (curl con cabecera Host).
+
+## Resultados de aceptación (2026-11-26)
+| Criterio | Prueba | Resultado |
+|---|---|---|
+| 1 Transacción | POST con producto inexistente → sin pedido huérfano | ✅ 422, id consumido y deshecho |
+| 2 GET | `/pedidos/{id}` y `/pedidos/99999999` | ✅ 200 / 404 |
+| 3 Errores 4xx | cliente inexistente, cantidad 0, producto repetido | ✅ 422 (BBDD) / 422 (Pydantic) |
+| 4 Salud | `/salud` con y sin Postgres | ✅ 200 / 503 |
+| 5–6 Imagen y Argo | `tienda-back:0.1.0`, Application `tienda` | ✅ Synced / Healthy |
+| 7 Ingress | `tienda.localhost:8080` | ✅ |
+| 8 Réplicas y probes | 2 réplicas; liveness `/vivo`, readiness `/salud` | ✅ |
+| 9 Sin secretos en Git | `git grep password` | ✅ solo referencias |
+| 10 Mínimo privilegio | `pg_stat_activity` | ✅ `app_rw` desde IPs de los pods |
+| 11 Resiliencia | `kubectl delete pod postgres-0` | ✅ pods 0/1 sin reinicios, vuelven solos |
+
+## Lecciones
+- La liveness nunca depende de otros servicios: si mirase Postgres, su caída reiniciaría la API en bucle (CrashLoopBackOff).
+- Traefik: 404 = ninguna regla coincide; 503 = regla sin pods listos detrás.
+- Un Ingress sin `host:` actúa como comodín (lo comprobamos con un `Host` mal escrito que acabó en whoami).
